@@ -2,10 +2,12 @@ from fastapi import APIRouter
 from schemas.job import JobCreate,JobUpdate
 router =APIRouter(prefix="/job",tags=["job"])
 jobs = []
+
 @router.post("/")
 def create_job(job: JobCreate):
     jobs.append(job)
     return jobs
+
 @router.get("/")
 def get_all_job():
     return jobs
