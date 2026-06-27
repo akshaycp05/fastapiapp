@@ -1,6 +1,6 @@
-# fastapiapp
+# Fastapiapp
 
-## creating fastapi application
+## Creating fastapi application
 
 # CRUD operations
 
@@ -16,7 +16,7 @@
 - PUT
 - DELETE
 
-# status codes
+# Status codes
 
 - 200 OK
 - 201 Created
@@ -39,9 +39,9 @@
 - Middleware -- request processing pipeline
 - schema -- pydantic models for validation
 
-# database
+# Database
 
-## relational database
+## Relational database
 
 - mysql
 - postgresql
@@ -49,14 +49,14 @@
 - sql server
 
 
-## non-relational database
+## Non-relational database
 
 - mongodb
 - cassandra
 - redis
 - dynamodb
 
-# constraints in database
+# Constraints in database
 
 - primary key -- eg: student_id
 - foreign key -- eg: department_id in student table
@@ -68,7 +68,7 @@
 # mysql example
 
 CREATE TABLE Students(
-  Student_ID int PRIMARY KEY,
-  LastName varchar(255) NOT NULL,
-  FirstName varchar(255)
+  Student_ID int PRIMARY KEY, 
+  LastName varchar(255) NOT NULL, 
+  FirstName varchar(255) 
 );
