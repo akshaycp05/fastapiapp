@@ -11,15 +11,13 @@ class JobBase(BaseModel):
 class JobCreate(JobBase):
     pass
 
-class JobUpdate(JobBase):
-    title: str= None
-    salary: int = None
+class JobUpdate(BaseModel):
+    title: Optional[str] = None
+    salary: Optional[int] = None
     description: Optional[str] = None
     company_id: Optional[int] = None
 
 class JobResponse(JobBase):
     id: int
-    company_id: int
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}

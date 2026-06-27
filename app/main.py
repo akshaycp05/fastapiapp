@@ -1,9 +1,23 @@
-from fastapi import FastAPI
-from database import Base,engine
-from routers import company,job
+from fastapi import FastAPI, Request, status
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from database import Base, engine
+import models.job
+import models.company
+from routers import company, job
 
 app = FastAPI()
-print("engine is :",engine)
+print("engine is :", engine)
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={
+            "message": "Unprocessable Content - invalid request body",
+            "errors": exc.errors(),
+        },
+    )
 
 Base.metadata.create_all(bind=engine)
 

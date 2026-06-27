@@ -10,15 +10,15 @@ class CompanyBase(BaseModel):
 
 class CompanyCreate(CompanyBase):
     pass
-    
-class CompanyUpdate(CompanyBase):
+
+class CompanyUpdate(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
 
 class CompanyResponse(CompanyBase):
     id: int
-    job: list = [JobResponse]
+    jobs: list[JobResponse] = []
 
     class Config:
         from_attributes = True
