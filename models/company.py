@@ -1,4 +1,5 @@
-from SQLalchemy import Column, Integer, String, Enum,relationship
+from SQLalchemy import Column, Integer, String, Enum
+from sqlalchemy.orm import relationship
 from database import Base, engine, SessionLocal
 
 Base = declarative_base()
