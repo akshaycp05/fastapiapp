@@ -5,6 +5,7 @@ from database import Base, engine
 import models.job
 import models.company
 from routers import company, job
+from models import company as company_model, job as job_model
 
 app = FastAPI()
 print("engine is :", engine)
