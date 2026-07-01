@@ -12,7 +12,7 @@ class CompanyBase(BaseModel):
 class CompanyCreate(CompanyBase):
     pass
 
-class CompanyUpdate(BaseModel):
+class CompanyUpdate(CompanyBase):
     pass
 
 class CompanyResponse(CompanyBase):

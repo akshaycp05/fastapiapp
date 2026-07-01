@@ -4,7 +4,7 @@ import CompanyCard from "./components/CompanyCard";
 import JobCard from "./components/JobCard";
 import Footer from "./components/footer";
 import { useEffect, useState } from "react";
-import { getCompanies } from "./Services/CompanyService";
+import { getCompanies, createCompany, updateCompany, deleteCompany } from "./Services/CompanyService";
 import type { Company } from "./types/company";
 
 function App() {
@@ -41,6 +41,33 @@ function App() {
     };
   }, []);
 
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteCompany(String(id));
+      await fetchCompanies();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleEdit = async (company: Company) => {
+    try {
+      const updated = await updateCompany(String(company.id), company);
+      setCompanies((current) => current.map((item) => (item.id === updated.id ? updated : item)));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleAdd = async (company: Company) => {
+    try {
+      await createCompany(company);
+      await fetchCompanies();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -55,7 +82,11 @@ function App() {
       <Welcome />
       <br />
       <CompanyCard 
-      companies={companies} />
+        companies={companies}
+        onadd={handleAdd}
+        onedit={handleEdit}
+        ondelete={handleDelete}
+      />
       <JobCard />
       <Footer />
     </>
