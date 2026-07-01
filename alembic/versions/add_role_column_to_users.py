@@ -1,9 +1,8 @@
-"""initial migration
+"""add role column to users
 
-Revision ID: 6f3f4dfe83f5
-Revises: 
-Create Date: 2026-06-29 11:19:58.536815
-
+Revision ID: add_role_column_to_users
+Revises: 9604598fb130
+Create Date: 2026-07-01 15:30:00.000000
 """
 from typing import Sequence, Union
 
@@ -12,19 +11,15 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '6f3f4dfe83f5'
-down_revision: Union[str, Sequence[str], None] = None
+revision: str = 'add_role_column_to_users'
+down_revision: Union[str, Sequence[str], None] = '9604598fb130'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    """Upgrade schema."""
-    op.add_column('companies', sa.Column('location', sa.String(), nullable=True))
     op.add_column('users', sa.Column('role', sa.String(), nullable=False, server_default='user'))
 
 
 def downgrade() -> None:
-    """Downgrade schema."""
     op.drop_column('users', 'role')
-    op.drop_column('companies', 'location')

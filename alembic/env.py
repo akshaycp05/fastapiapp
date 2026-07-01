@@ -21,7 +21,8 @@ if config.config_file_name is not None:
 from database import Base
 from models.company import Company
 from models.job import Job
-target_metadata = Company.metadata
+from models.user import User
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

@@ -4,7 +4,6 @@ from models.company import Company
 from sqlalchemy.orm import Session
 from database import get_db,SessionLocal
 
-
 router = APIRouter(prefix="/company",tags=["company"])
 
 @router.post("/",status_code=status.HTTP_201_CREATED,response_model=CompanyResponse)
@@ -14,7 +13,6 @@ def create_company(company: CompanyCreate,db:Session=Depends(get_db)):
     db.commit()
     db.refresh(db_company)
     return db_company
-
 
 @router.get("/",status_code=status.HTTP_200_OK,response_model=list[CompanyResponse])
 def get_all_company(db:Session=Depends(get_db)):
