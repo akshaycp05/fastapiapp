@@ -1,13 +1,16 @@
-from fastapi import APIRouter, HTTPException, status
 from schemas.job import JobCreate, JobUpdate, JobResponse
-
+from fastapi import APIRouter,HTTPException,Depends,status
+from models.company import Company
+from sqlalchemy.orm import Session
+from database import get_db,SessionLocal
+from utils.oauth2 import get_current_user, role_required
 router = APIRouter(prefix="/job", tags=["job"])
 
 jobs: list[dict] = []
 next_job_id = 1
 
 @router.post("/", response_model=JobResponse, status_code=status.HTTP_201_CREATED)
-def create_job(job: JobCreate):
+def create_job(job: JobCreate,db:Session=Depends(get_db),current_user: dict = Depends(role_required(["admin","hr"]))):
     global next_job_id
     job_data = job.model_dump()
     job_data["id"] = next_job_id
@@ -16,7 +19,7 @@ def create_job(job: JobCreate):
     return job_data
 
 @router.get("/", response_model=list[JobResponse])
-def get_all_job():
+def get_all_job(db:Session=Depends(get_db),current_user = Depends(get_current_user)):
     return jobs
 
 def find_job(job_id: int) -> dict | None:

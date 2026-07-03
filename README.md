@@ -115,3 +115,139 @@ refresh token -> used to refresh access token
 
 
 pip install python-multipart
+
+
+# 📁 Project Architecture
+
+```text
+fastapiapp/
+│
+├── 📂 backend/
+│   │
+│   ├── 📂 app/
+│   │   └── main.py                    # FastAPI Entry Point
+│   │
+│   ├── 📂 alembic/                    # Database Migrations
+│   │   ├── versions/
+│   │   ├── env.py
+│   │   ├── README
+│   │   └── script.py.mako
+│   │
+│   ├── 📂 models/                     # SQLAlchemy Models
+│   │   ├── __init__.py
+│   │   ├── user.py
+│   │   ├── company.py
+│   │   └── job.py
+│   │
+│   ├── 📂 routers/                    # API Routes
+│   │   ├── __init__.py
+│   │   ├── auth.py
+│   │   ├── company.py
+│   │   └── job.py
+│   │
+│   ├── 📂 schemas/                    # Pydantic Schemas
+│   │   ├── __init__.py
+│   │   ├── user.py
+│   │   ├── company.py
+│   │   ├── job.py
+│   │   └── token.py
+│   │
+│   ├── 📂 utils/                      # Authentication & Security
+│   │   ├── oauth2.py
+│   │   ├── security.py
+│   │   └── token.py
+│   │
+│   ├── 📂 tests/                      # Unit Tests
+│   │   └── test_security.py
+│   │
+│   ├── .env                           # Environment Variables
+│   ├── alembic.ini
+│   ├── database.py                    # Database Configuration
+│   ├── check_db_schema.py
+│   ├── index.html
+│   ├── README.md
+│   └── requirements.txt
+│
+├── 📂 frontend/
+│   │
+│   ├── 📂 talentspark/
+│   │   │
+│   │   ├── 📂 public/
+│   │   │   ├── favicon.svg
+│   │   │   └── icons.svg
+│   │   │
+│   │   ├── 📂 src/
+│   │   │   │
+│   │   │   ├── 📂 assets/
+│   │   │   │   ├── hero.png
+│   │   │   │   ├── react.svg
+│   │   │   │   └── vite.svg
+│   │   │   │
+│   │   │   ├── 📂 components/
+│   │   │   │   ├── NavBar.tsx
+│   │   │   │   ├── Welcome.tsx
+│   │   │   │   ├── CompanyCard.tsx
+│   │   │   │   ├── JobCard.tsx
+│   │   │   │   └── Footer.tsx
+│   │   │   │
+│   │   │   ├── 📂 Services/
+│   │   │   │   ├── CompanyService.ts
+│   │   │   │   └── JobService.ts
+│   │   │   │
+│   │   │   ├── 📂 types/
+│   │   │   │   ├── company.ts
+│   │   │   │   └── job.ts
+│   │   │   │
+│   │   │   ├── App.tsx
+│   │   │   ├── App.css
+│   │   │   ├── index.css
+│   │   │   └── main.tsx
+│   │   │
+│   │   ├── 📂 dist/                   # Production Build
+│   │   ├── package.json
+│   │   ├── package-lock.json
+│   │   ├── vite.config.ts
+│   │   ├── tsconfig.json
+│   │   ├── tsconfig.app.json
+│   │   ├── tsconfig.node.json
+│   │   ├── eslint.config.js
+│   │   └── README.md
+│   │
+│   ├── app.js
+│   ├── company.js
+│   ├── test.js
+│   ├── test1.js
+│   ├── test1.ts
+│   ├── package.json
+│   └── package-lock.json
+│
+├── 📂 .venv/                          # Python Virtual Environment
+│
+└── 📂 python_basic/                   # Python Practice & Learning
+```
+
+
+Preview
+
+fastapiapp
+│
+├── 📂 backend
+│   ├── 📂 app
+│   ├── 📂 models
+│   ├── 📂 routers
+│   ├── 📂 schemas
+│   ├── 📂 utils
+│   ├── 📂 tests
+│   ├── 📂 alembic
+│   ├── database.py
+│   └── requirements.txt
+│
+├── 📂 frontend
+│   └── 📂 talentspark
+│       ├── 📂 src
+│       ├── 📂 public
+│       ├── 📂 dist
+│       └── package.json
+│
+├── 📂 .venv
+└── 📂 python_basic
