@@ -1,52 +1,56 @@
-from schemas.job import JobCreate, JobUpdate, JobResponse
 from fastapi import APIRouter,HTTPException,Depends,status
-from models.company import Company
+from schemas.job import JobCreate, JobUpdate,JobResponse
+from models.job import Job
 from sqlalchemy.orm import Session
-from database import get_db,SessionLocal
-from utils.oauth2 import get_current_user, role_required
+from database import get_db
+from utils.oauth2 import role_required,get_current_user
+
 router = APIRouter(prefix="/job", tags=["job"])
 
-jobs: list[dict] = []
-next_job_id = 1
+@router.post("/",status_code=status.HTTP_201_CREATED,response_model=JobResponse)
+def create_job(job: JobCreate,db:Session=Depends(get_db),current_user=Depends(role_required(["admin","hr"]))):
+    db_job = Job(**job.dict())
+    db.add(db_job)
+    db.commit()
+    db.refresh(db_job)
+    return db_job
 
-@router.post("/", response_model=JobResponse, status_code=status.HTTP_201_CREATED)
-def create_job(job: JobCreate,db:Session=Depends(get_db),current_user: dict = Depends(role_required(["admin","hr"]))):
-    global next_job_id
-    job_data = job.model_dump()
-    job_data["id"] = next_job_id
-    next_job_id += 1
-    jobs.append(job_data)
-    return job_data
-
-@router.get("/", response_model=list[JobResponse])
-def get_all_job(db:Session=Depends(get_db),current_user = Depends(get_current_user)):
+@router.get("/",status_code=status.HTTP_200_OK,response_model=list[JobResponse])
+def get_all_job(db:Session=Depends(get_db),current_user=Depends(get_current_user)):
+    jobs = db.query(Job).all()
     return jobs
 
-def find_job(job_id: int) -> dict | None:
-    return next((job for job in jobs if job["id"] == job_id), None)
-
-@router.get("/{job_id}", response_model=JobResponse)
-def get_job(job_id: int):
-    job = find_job(job_id)
+@router.get("/{job_id}",status_code=status.HTTP_200_OK,response_model=JobResponse)
+def get_job(job_id: int,db:Session=Depends(get_db),current_user=Depends(get_current_user)):
+    job = db.query(Job).filter(Job.id == job_id).first()
     if not job:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
     return job
 
-@router.put("/{job_id}", response_model=JobResponse)
-def update_job(job_id: int, job: JobUpdate):
-    stored_job = find_job(job_id)
-    if not stored_job:
+@router.put("/{job_id}",status_code=status.HTTP_201_CREATED,response_model=JobResponse)
+def update_job(job_id: int, job: JobUpdate,db:Session=Depends(get_db),current_user=Depends(role_required(["admin","hr"]))):
+    db_job = db.query(Job).filter(Job.id == job_id).first()
+    if not db_job:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
-    update_data = job.model_dump(exclude_unset=True)
-    if not update_data:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No fields provided for update")
-    stored_job.update(update_data)
-    return stored_job
+    for key, value in job.dict().items():
+        setattr(db_job, key, value)
+    db.commit()
+    db.refresh(db_job)
+    return db_job
 
-@router.delete("/{job_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_job(job_id: int):
-    job = find_job(job_id)
-    if not job:
+@router.delete("/{job_id}",status_code=status.HTTP_204_NO_CONTENT)
+def delete_job(job_id: int,db:Session=Depends(get_db),current_user=Depends(role_required(["admin","hr"]))):
+    db_job = db.query(Job).filter(Job.id == job_id).first()
+    if not db_job:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
-    jobs.remove(job)
-    return None
+    db.delete(db_job)
+    db.commit()
+    return {"message": "Job deleted successfully"}
+
+# @router.get("/")
+# def read_job():
+#     return {"job": "Job root"}
+
+# @router.get("/{job_id}")
+# def read_job(job_id: int):
+#     return {"job_id": job_id}
