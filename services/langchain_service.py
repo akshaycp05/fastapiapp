@@ -1,17 +1,29 @@
 import os
 from dotenv import load_dotenv
 
-from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
+# Load environment variables
 load_dotenv()
 
-llm = ChatOpenAI(
-    model="gpt-4o-mini",
+# Get API Key
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+if not GROQ_API_KEY:
+    raise ValueError(
+        "GROQ_API_KEY not found. Please add it to your .env file."
+    )
+
+# Initialize Groq LLM
+llm = ChatGroq(
+    groq_api_key=GROQ_API_KEY,
+    model_name="llama-3.3-70b-versatile",
     temperature=0.4,
-    api_key=os.getenv("OPENAI_API_KEY")
 )
 
+# Prompt Template
 prompt = ChatPromptTemplate.from_messages(
     [
         (
@@ -19,24 +31,30 @@ prompt = ChatPromptTemplate.from_messages(
             """
             You are TalentSpark AI.
 
-            You help students with:
+            You are an AI Career Assistant.
 
-            • Resume Analysis
-            • Career Guidance
-            • Job Recommendations
-            • Interview Preparation
-            • ATS Tips
+            You help users with:
+            - Resume Analysis
+            - Career Guidance
+            - Job Recommendations
+            - Interview Preparation
+            - ATS Resume Tips
+            - AI/ML Learning Roadmaps
 
-            Keep answers short and professional.
-            """
+            Always give clear, short and professional answers.
+            """,
         ),
-        ("human", "{question}")
+        ("human", "{question}"),
     ]
 )
 
-chain = prompt | llm
+# Create Chain
+chain = prompt | llm | StrOutputParser()
 
 
-def ask_ai(question: str):
-    response = chain.invoke({"question": question})
-    return response.content 
+def ask_ai(question: str) -> str:
+    """Generate an AI response."""
+    try:
+        return chain.invoke({"question": question})
+    except Exception as e:
+        return f"AI Error: {str(e)}"

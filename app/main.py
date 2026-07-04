@@ -7,7 +7,7 @@ from models import user as user_model
 from models import company as company_model
 from models import job as job_model
 
-from routers import auth, company, job
+from routers import auth, company, job, chat
 
 from pydantic import BaseModel
 from utils.langchain import ask_ai
@@ -28,7 +28,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(company.router)
 app.include_router(job.router)
-
+app.include_router(chat.router)
 
 class ChatRequest(BaseModel):
     message: str
