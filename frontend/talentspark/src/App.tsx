@@ -109,8 +109,8 @@ function App() {
         getJobs(),
       ]);
 
-      setCompanies(companiesData);
-      setJobs(jobsData);
+      setCompanies(Array.isArray(companiesData) ? companiesData : []);
+      setJobs(Array.isArray(jobsData) ? jobsData : []);
     } catch (error) {
       setError(error as Error);
     } finally {

@@ -13,6 +13,9 @@ type Props = {
 
 function CompanyCard({
   companies, jobs, onAdd, onEdit, onDelete }: Props) {
+  const safeCompanies = Array.isArray(companies) ? companies : [];
+  const safeJobs = Array.isArray(jobs) ? jobs : [];
+
   const [editCompanyId, setEditCompanyId] = useState<number | null>(null);
   const [addform, setAddform] = useState<Company>({
     id: 0,
@@ -74,8 +77,10 @@ function CompanyCard({
 
       {/* Grid wrapper for structured card positioning */}
       <div className="company-grid">
-        {companies.map((company) => {
-          const currentCompanyJobs = jobs.filter(j => j.company_id === company.id).length;
+        {safeCompanies.length === 0 ? (
+          <p style={{ gridColumn: "1 / -1", color: "var(--text-muted)" }}>No companies available right now.</p>
+        ) : safeCompanies.map((company) => {
+          const currentCompanyJobs = safeJobs.filter(j => j.company_id === company.id).length;
           
           return (
             <div className="company-card" key={company.id}>

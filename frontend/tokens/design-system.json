@@ -1,0 +1,42 @@
+{
+  "name": "Premium AI SaaS System",
+  "colors": {
+    "surface": "#101415",
+    "surface-dim": "#101415",
+    "surface-bright": "#363a3b",
+    "surface-container-lowest": "#0b0f10",
+    "surface-container-low": "#191c1e",
+    "surface-container": "#1d2022",
+    "surface-container-high": "#272a2c",
+    "surface-container-highest": "#323537",
+    "on-surface": "#e0e3e5",
+    "on-surface-variant": "#c7c4d8",
+    "outline": "#918fa1",
+    "outline-variant": "#464555",
+    "surface-tint": "#c3c0ff",
+    "primary": "#c3c0ff",
+    "on-primary": "#1d00a5",
+    "primary-container": "#4f46e5",
+    "on-primary-container": "#dad7ff",
+    "secondary": "#d2bbff",
+    "on-secondary": "#3f008e",
+    "secondary-container": "#6001d1",
+    "tertiary": "#b4c5ff",
+    "on-tertiary": "#002a78",
+    "error": "#ffb4ab",
+    "background": "#101415",
+    "on-background": "#e0e3e5"
+  },
+  "typography": {
+    "display-lg": { "fontFamily": "Inter", "fontSize": "72px", "fontWeight": 700, "lineHeight": "80px", "letterSpacing": "-0.04em" },
+    "headline-lg": { "fontFamily": "Inter", "fontSize": "48px", "fontWeight": 600, "lineHeight": "56px", "letterSpacing": "-0.02em" },
+    "headline-lg-mobile": { "fontFamily": "Inter", "fontSize": "32px", "fontWeight": 600, "lineHeight": "40px", "letterSpacing": "-0.02em" },
+    "headline-md": { "fontFamily": "Inter", "fontSize": "30px", "fontWeight": 600, "lineHeight": "38px", "letterSpacing": "-0.01em" },
+    "body-lg": { "fontFamily": "Inter", "fontSize": "18px", "fontWeight": 400, "lineHeight": "28px" },
+    "body-md": { "fontFamily": "Inter", "fontSize": "16px", "fontWeight": 400, "lineHeight": "24px" },
+    "label-md": { "fontFamily": "Inter", "fontSize": "14px", "fontWeight": 500, "lineHeight": "20px", "letterSpacing": "0.01em" },
+    "label-sm": { "fontFamily": "Inter", "fontSize": "12px", "fontWeight": 600, "lineHeight": "16px" }
+  },
+  "rounded": { "sm": "0.25rem", "DEFAULT": "0.5rem", "md": "0.75rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+  "spacing": { "base": "4px", "xs": "4px", "sm": "8px", "md": "16px", "lg": "24px", "xl": "40px", "2xl": "64px", "3xl": "80px", "container-max": "1280px", "gutter": "24px" }
+}
