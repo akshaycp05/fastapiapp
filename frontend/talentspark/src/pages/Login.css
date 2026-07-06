@@ -11,7 +11,7 @@
     display:flex;
     justify-content:center;
     align-items:center;
-    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    background:linear-gradient(135deg,#ffffff,#170f5e);
 }
 
 .login-card{
@@ -25,7 +25,7 @@
 
 .login-title{
     text-align:center;
-    color:#2563eb;
+    color:#3d4a64;
     margin-bottom:10px;
 }
 
@@ -57,7 +57,7 @@
 
 .login-btn{
     padding:14px;
-    background:#2563eb;
+    background:#1d3361;
     color:white;
     border:none;
     border-radius:10px;
@@ -67,7 +67,7 @@
 }
 
 .login-btn:hover{
-    background:#1d4ed8;
+    background:#031033;
     transform:translateY(-2px);
 }
 
@@ -83,14 +83,14 @@
     padding:12px;
     border:none;
     border-radius:10px;
-    background:#7c3aed;
+    background:#200c44;
     color:white;
     cursor:pointer;
     transition:.3s;
 }
 
 .register-btn:hover{
-    background:#6d28d9;
+    background:#4a3868;
     transform:translateY(-2px);
 }
 

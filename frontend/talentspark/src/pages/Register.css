@@ -11,7 +11,7 @@
     display:flex;
     justify-content:center;
     align-items:center;
-    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    background:linear-gradient(135deg,#ffffff,#170f5e);
 }
 
 .register-card{
@@ -25,7 +25,7 @@
 
 .register-title{
     text-align:center;
-    color:#2563eb;
+    color:#4465ac;
     margin-bottom:10px;
 }
 
@@ -53,7 +53,7 @@
 .register-form input:focus,
 .register-form select:focus{
     outline:none;
-    border-color:#2563eb;
+    border-color:#3e578d;
     box-shadow:0 0 10px rgba(37,99,235,.25);
 }
 
@@ -61,7 +61,7 @@
     padding:14px;
     border:none;
     border-radius:10px;
-    background:#2563eb;
+    background:#394d79;
     color:white;
     font-size:16px;
     cursor:pointer;
@@ -69,7 +69,7 @@
 }
 
 .register-submit-btn:hover{
-    background:#1d4ed8;
+    background:#314681;
     transform:translateY(-2px);
 }
 
