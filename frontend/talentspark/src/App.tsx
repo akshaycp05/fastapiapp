@@ -22,6 +22,13 @@ import {
   createJob,
 } from "./Services/JobService";
 import { sendChatMessage } from "./Services/ChatService.ts";
+import {
+  embedJobs,
+  semanticSearch,
+  ragAsk,
+  analyseResume,
+  matchJobs,
+} from "./Services/RagService";
 
 import type { Company } from "./types/company";
 import type { Job } from "./types/job";
@@ -50,6 +57,10 @@ function App() {
     },
   ]);
   const [chatLoading, setChatLoading] = useState(false);
+  const [chatMode, setChatMode] = useState<"chat" | "ragAsk" | "semanticSearch" | "jobMatch" | "analyseResume">("chat");
+  const [skillsInput, setSkillsInput] = useState("");
+  const [experienceInput, setExperienceInput] = useState("");
+  const [syncingEmbeddings, setSyncingEmbeddings] = useState(false);
 
   const [token, setToken] = useState<string | null>(
     localStorage.getItem("token")
@@ -204,18 +215,62 @@ function App() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages, chatLoading]);
 
+  async function handleSyncEmbeddings() {
+    if (syncingEmbeddings) return;
+    setSyncingEmbeddings(true);
+    
+    const startMsgId = Date.now();
+    setChatMessages((prev) => [
+      ...prev,
+      {
+        id: startMsgId,
+        role: "assistant",
+        text: "Syncing jobs to vector database (Qdrant)... Please wait.",
+      }
+    ]);
+
+    try {
+      const res = await embedJobs();
+      setChatMessages((prev) => [
+        ...prev.filter(m => m.id !== startMsgId),
+        {
+          id: Date.now(),
+          role: "assistant",
+          text: `✅ Sync Completed! ${res.message} (Total embedded: ${res.count})`,
+        }
+      ]);
+    } catch (e: any) {
+      setChatMessages((prev) => [
+        ...prev.filter(m => m.id !== startMsgId),
+        {
+          id: Date.now(),
+          role: "assistant",
+          text: `❌ Sync Failed: ${e?.message || e || "Unknown error"}`,
+        }
+      ]);
+    } finally {
+      setSyncingEmbeddings(false);
+    }
+  }
+
   async function handleChatSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const message = chatInput.trim();
-    if (!message || chatLoading) {
-      return;
+    let displayMessage = "";
+    let messageToSend = "";
+    if (chatMode === "jobMatch") {
+      if (!skillsInput.trim() || !experienceInput.trim() || chatLoading) return;
+      displayMessage = `Job Match Request:\n- Skills: ${skillsInput.trim()}\n- Experience: ${experienceInput.trim()}`;
+    } else {
+      if (!chatInput.trim() || chatLoading) return;
+      displayMessage = chatInput.trim();
+      messageToSend = chatInput.trim();
     }
 
     const userMessage: ChatMessage = {
       id: Date.now(),
       role: "user",
-      text: message,
+      text: displayMessage,
     };
 
     setChatMessages((prev) => [...prev, userMessage]);
@@ -223,7 +278,42 @@ function App() {
     setChatLoading(true);
 
     try {
-      const reply = await sendChatMessage(message);
+      let reply = "";
+      if (chatMode === "chat") {
+        reply = await sendChatMessage(messageToSend);
+      } else if (chatMode === "ragAsk") {
+        const ragRes = await ragAsk(messageToSend);
+        reply = ragRes.answer;
+      } else if (chatMode === "semanticSearch") {
+        const searchRes = await semanticSearch(messageToSend);
+        if (!searchRes.results || searchRes.results.length === 0) {
+          reply = "No matching jobs found.";
+        } else {
+          reply = "Here are the top semantic search results for jobs:\n\n" + 
+            searchRes.results.map((r, index) => 
+              `${index + 1}. **${r.title}** (Score: ${(r.score * 100).toFixed(1)}%)\n` + 
+              `   - Salary: ${r.salary || "N/A"}\n` + 
+              `   - Description: ${r.description.length > 150 ? r.description.substring(0, 150) + "..." : r.description}`
+            ).join("\n\n");
+        }
+      } else if (chatMode === "jobMatch") {
+        const matchRes = await matchJobs(skillsInput, experienceInput);
+        if (!matchRes.matches || matchRes.matches.length === 0) {
+          reply = "No matching jobs found for your profile.";
+        } else {
+          reply = "Here are the best matching jobs for your profile:\n\n" + 
+            matchRes.matches.map((r, index) => 
+              `${index + 1}. **${r.title}** (Match Score: ${(r.match_score * 100).toFixed(1)}%)\n` + 
+              `   - Salary: ${r.salary || "N/A"}\n` + 
+              `   - Description: ${r.description.length > 150 ? r.description.substring(0, 150) + "..." : r.description}`
+            ).join("\n\n");
+        }
+        setSkillsInput("");
+        setExperienceInput("");
+      } else if (chatMode === "analyseResume") {
+        const analysisRes = await analyseResume(messageToSend);
+        reply = `**Resume Analysis:**\n\n${analysisRes.analysis}`;
+      }
 
       setChatMessages((prev) => [
         ...prev,
@@ -233,13 +323,13 @@ function App() {
           text: reply,
         },
       ]);
-    } catch {
+    } catch (e: any) {
       setChatMessages((prev) => [
         ...prev,
         {
           id: Date.now() + 2,
           role: "assistant",
-          text: "The assistant is temporarily unavailable. Please try again in a moment.",
+          text: `The assistant is temporarily unavailable. Please try again. (Details: ${e?.message || e || "Unknown error"})`,
         },
       ]);
     } finally {
@@ -327,7 +417,57 @@ function App() {
               <p className="chat-panel-eyebrow">AI assistant</p>
               <h3>Talk with TalentSpark</h3>
             </div>
-            <span className="chat-status">Online</span>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+              <button 
+                type="button"
+                className="sync-embeddings-btn" 
+                onClick={handleSyncEmbeddings}
+                disabled={syncingEmbeddings}
+                title="Sync current jobs to Qdrant vector database"
+              >
+                {syncingEmbeddings ? "Syncing..." : "Sync Jobs (Embed)"}
+              </button>
+              <span className="chat-status">Online</span>
+            </div>
+          </div>
+
+          {/* RAG & Chat Mode Tabs */}
+          <div className="chat-tabs">
+            <button 
+              type="button"
+              className={`chat-tab ${chatMode === "chat" ? "active" : ""}`}
+              onClick={() => setChatMode("chat")}
+            >
+              General Chat
+            </button>
+            <button 
+              type="button"
+              className={`chat-tab ${chatMode === "ragAsk" ? "active" : ""}`}
+              onClick={() => setChatMode("ragAsk")}
+            >
+              RAG Q&A
+            </button>
+            <button 
+              type="button"
+              className={`chat-tab ${chatMode === "semanticSearch" ? "active" : ""}`}
+              onClick={() => setChatMode("semanticSearch")}
+            >
+              Job Search
+            </button>
+            <button 
+              type="button"
+              className={`chat-tab ${chatMode === "jobMatch" ? "active" : ""}`}
+              onClick={() => setChatMode("jobMatch")}
+            >
+              Job Match
+            </button>
+            <button 
+              type="button"
+              className={`chat-tab ${chatMode === "analyseResume" ? "active" : ""}`}
+              onClick={() => setChatMode("analyseResume")}
+            >
+              Analyze Resume
+            </button>
           </div>
 
           <div className="chat-messages">
@@ -345,12 +485,40 @@ function App() {
           </div>
 
           <form className="chat-input-row" onSubmit={handleChatSubmit}>
-            <input
-              type="text"
-              value={chatInput}
-              onChange={(event) => setChatInput(event.target.value)}
-              placeholder="Ask about jobs, career guidance, or resumes"
-            />
+            {chatMode === "jobMatch" ? (
+              <div className="job-match-inputs">
+                <input
+                  type="text"
+                  value={skillsInput}
+                  onChange={(event) => setSkillsInput(event.target.value)}
+                  placeholder="Skills (e.g. Python, SQL)"
+                  required
+                />
+                <input
+                  type="text"
+                  value={experienceInput}
+                  onChange={(event) => setExperienceInput(event.target.value)}
+                  placeholder="Experience (e.g. 3 years)"
+                  required
+                />
+              </div>
+            ) : (
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(event) => setChatInput(event.target.value)}
+                placeholder={
+                  chatMode === "chat" 
+                    ? "Ask about jobs, career guidance, or resumes" 
+                    : chatMode === "ragAsk"
+                    ? "Ask a question about jobs in database..."
+                    : chatMode === "semanticSearch"
+                    ? "Enter search keywords or job preferences..."
+                    : "Paste your resume text here for AI analysis..."
+                }
+                required
+              />
+            )}
             <button type="submit" disabled={chatLoading}>
               {chatLoading ? "Sending..." : "Send"}
             </button>

@@ -14,8 +14,10 @@ def get_current_user(token: str=Depends(oauth2_scheme),db:Session=Depends(get_db
         raise HTTPException(status_code=401,detail="Invalid credentials")
     return current_user
 def role_required(roles:list):
+    normalized_roles = [r.lower() for r in roles]
     def role_decorator(current_user=Depends(get_current_user)):
-        if current_user.role not in roles:
-            raise HTTPException(status_code=403,detail="Access denied")
+        user_role = getattr(current_user, "role", "").lower()
+        if user_role not in normalized_roles:
+            raise HTTPException(status_code=403, detail="Access denied")
         return current_user
-    return role_decorator   
+    return role_decorator
