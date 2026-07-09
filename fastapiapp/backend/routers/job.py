@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from database import get_db
+from sqlalchemy.orm import selectinload
 from utils.oauth2 import role_required,get_current_user
 
 router = APIRouter(prefix="/job", tags=["job"])
@@ -25,8 +26,7 @@ async def create_job(job: JobCreate,db:AsyncSession=Depends(get_db),current_user
 async def get_all_job(db:AsyncSession=Depends(get_db),current_user=Depends(get_current_user)):
     try:
         result = await db.execute(select(Job))
-        options(selectionload(Company.jobs))
-        companies = result.scalars().all()
+        jobs = result.scalars().all()
         return jobs
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Database error retrieving jobs: {str(e)}")

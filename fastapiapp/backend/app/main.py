@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from routers import company,job,auth,chat,rag
 from database import Base
-from models import job as job_model,company as company_model,users as user_model
+from models import job as job_model,company as company_model,user as user_model
 from fastapi.middleware.cors import CORSMiddleware
 
 
