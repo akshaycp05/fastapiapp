@@ -2,26 +2,31 @@ import os
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import declarative_base
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql+asyncpg://postgres:password@localhost:5432/Student_db"
+
+def normalize_database_url(url: str) -> str:
+    if not url:
+        return url
+
+    normalized = url.strip()
+
+    if normalized.startswith("postgres://"):
+        return normalized.replace("postgres://", "postgresql+asyncpg://", 1)
+
+    if normalized.startswith("postgres+asyncpg://"):
+        return normalized.replace("postgres+asyncpg://", "postgresql+asyncpg://", 1)
+
+    if normalized.startswith("postgresql://"):
+        return normalized.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+    return normalized
+
+
+DATABASE_URL = normalize_database_url(
+    os.getenv(
+        "DATABASE_URL",
+        "postgresql+asyncpg://postgres:password@localhost:5432/Student_db",
+    )
 )
-
-# Convert old postgres:// URLs (Render/Heroku)
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace(
-        "postgres://",
-        "postgresql+asyncpg://",
-        1,
-    )
-
-# Convert normal PostgreSQL URLs
-if DATABASE_URL.startswith("postgresql://"):
-    DATABASE_URL = DATABASE_URL.replace(
-        "postgresql://",
-        "postgresql+asyncpg://",
-        1,
-    )
 
 print("DATABASE_URL =", DATABASE_URL)
 
