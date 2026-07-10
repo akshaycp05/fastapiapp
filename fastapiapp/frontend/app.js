@@ -1,1 +1,0 @@
-import {name} from './company.js';

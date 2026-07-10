@@ -1,37 +1,95 @@
-const fs = require('fs');
-const path = require('path');
-
-const tokensPath = path.resolve(__dirname, 'tokens', 'design-system.json');
-let tokens = {};
-try {
-  tokens = JSON.parse(fs.readFileSync(tokensPath, 'utf8'));
-} catch (e) {
-  console.warn('Could not load design tokens:', e.message);
-}
-
-module.exports = {
-  content: ['./src/**/*.{js,ts,jsx,tsx,html}', './**/*.html'],
-  darkMode: 'class',
+/** @type {import('tailwindcss').Config} */
+export default {
+  darkMode: "class",
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      colors: tokens.colors || {},
-      borderRadius: {
-        DEFAULT: tokens.rounded && tokens.rounded.DEFAULT ? tokens.rounded.DEFAULT : '0.5rem',
-        lg: tokens.rounded && tokens.rounded.lg ? tokens.rounded.lg : '1rem',
-        xl: tokens.rounded && tokens.rounded.xl ? tokens.rounded.xl : '1.5rem',
-        full: tokens.rounded && tokens.rounded.full ? tokens.rounded.full : '9999px'
+      colors: {
+        "on-secondary": "#ffffff",
+        secondary: "#006c4a",
+        "on-primary-fixed": "#131b2e",
+        "on-primary-fixed-variant": "#3f465c",
+        "primary-fixed-dim": "#bec6e0",
+        "on-secondary-container": "#00714e",
+        outline: "#76777d",
+        "surface-container-highest": "#e0e3e5",
+        "tertiary-container": "#07006c",
+        "secondary-container": "#82f5c1",
+        "on-surface": "#191c1e",
+        "on-tertiary": "#ffffff",
+        "surface-container-high": "#e6e8ea",
+        "inverse-surface": "#2d3133",
+        surface: "#f7f9fb",
+        "on-secondary-fixed": "#002114",
+        "on-secondary-fixed-variant": "#005137",
+        "inverse-on-surface": "#eff1f3",
+        "on-error-container": "#93000a",
+        "surface-dim": "#d8dadc",
+        error: "#ba1a1a",
+        background: "#f7f9fb",
+        "primary-container": "#131b2e",
+        "surface-variant": "#e0e3e5",
+        "tertiary-fixed": "#e1e0ff",
+        "surface-container-low": "#f2f4f6",
+        tertiary: "#000000",
+        "error-container": "#ffdad6",
+        "tertiary-fixed-dim": "#c0c1ff",
+        "surface-container-lowest": "#ffffff",
+        "on-background": "#191c1e",
+        "on-error": "#ffffff",
+        "outline-variant": "#c6c6cd",
+        "on-surface-variant": "#45464d",
+        "on-primary-container": "#7c839b",
+        "surface-tint": "#565e74",
+        "on-primary": "#ffffff",
+        "on-tertiary-fixed-variant": "#2f2ebe",
+        "surface-container": "#eceef0",
+        "secondary-fixed-dim": "#68dba9",
+        "primary-fixed": "#dae2fd",
+        primary: "#000000",
+        "inverse-primary": "#bec6e0",
+        "secondary-fixed": "#85f8c4",
+        "on-tertiary-container": "#7073ff",
+        "on-tertiary-fixed": "#07006c",
+        "surface-bright": "#f7f9fb",
       },
-      spacing: Object.fromEntries(Object.entries(tokens.spacing || {}).map(([k,v])=>[k, v])),
+      borderRadius: {
+        DEFAULT: "0.125rem",
+        lg: "0.25rem",
+        xl: "0.5rem",
+        full: "0.75rem",
+      },
+      spacing: {
+        lg: "2.5rem",
+        xl: "4rem",
+        xs: "0.5rem",
+        md: "1.5rem",
+        base: "4px",
+        gutter: "1.5rem",
+        sm: "1rem",
+        "container-max": "1440px",
+      },
       fontFamily: {
-        Inter: ['Inter', 'ui-sans-serif', 'system-ui']
+        "headline-lg": ["Unbounded"],
+        "body-sm": ["Inter"],
+        "headline-md": ["Unbounded"],
+        "headline-sm": ["Unbounded"],
+        "label-md": ["JetBrains Mono"],
+        "body-md": ["Inter"],
+        "body-lg": ["Inter"],
+        "display-lg": ["Unbounded"],
       },
       fontSize: {
-        'display-lg': tokens.typography && tokens.typography['display-lg'] ? tokens.typography['display-lg'].fontSize : '72px',
-        'headline-lg': tokens.typography && tokens.typography['headline-lg'] ? tokens.typography['headline-lg'].fontSize : '48px',
-        'headline-md': tokens.typography && tokens.typography['headline-md'] ? tokens.typography['headline-md'].fontSize : '30px',
-        'body-md': tokens.typography && tokens.typography['body-md'] ? tokens.typography['body-md'].fontSize : '16px'
-      }
-    }
+        "headline-lg": ["32px", { lineHeight: "1.2", fontWeight: "600" }],
+        "body-sm": ["12px", { lineHeight: "1.4", fontWeight: "400" }],
+        "headline-md": ["24px", { lineHeight: "1.3", fontWeight: "500" }],
+        "headline-sm": ["18px", { lineHeight: "1.4", fontWeight: "500" }],
+        "label-md": ["12px", { lineHeight: "1", letterSpacing: "0.05em", fontWeight: "500" }],
+        "body-md": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
+        "body-lg": ["16px", { lineHeight: "1.6", fontWeight: "400" }],
+        "display-lg": ["48px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" }],
+      },
+    },
   },
-  plugins: [require('@tailwindcss/forms')]
+  plugins: [],
 };
