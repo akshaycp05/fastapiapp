@@ -30,12 +30,13 @@ if "supabase.com" in DATABASE_URL:
     engine = create_async_engine(
         DATABASE_URL,
         echo=False,
-        connect_args={"ssl": "require"},
+        connect_args={"ssl": "require", "statement_cache_size": 0},
     )
 else:
     engine = create_async_engine(
         DATABASE_URL,
         echo=False,
+        connect_args={"statement_cache_size": 0},
     )
 
 SessionLocal = async_sessionmaker(
@@ -43,6 +44,7 @@ SessionLocal = async_sessionmaker(
     class_=AsyncSession,
     autoflush=False,
     autocommit=False,
+    expire_on_commit=False,
 )
 
 Base = declarative_base()
