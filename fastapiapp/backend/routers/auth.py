@@ -3,8 +3,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from models.user import User
-from schemas.user import UserCreate,UserResponse
-from schemas.token import Token
+from schemas.user import UserCreate, UserResponse
+from schemas.token import LoginResponse
 from database import get_db
 from utils.security import hash_password,verify_password
 from utils.token import create_access_token
@@ -35,7 +35,7 @@ async def register(user:UserCreate,db:AsyncSession = Depends(get_db)):
         await db.rollback()
         raise HTTPException(status_code=500, detail=f"Database error during registration: {str(e)}")
 
-@router.post("/login",response_model=Token)
+@router.post("/login",response_model=LoginResponse)
 async def login(form_data:OAuth2PasswordRequestForm=Depends(),db:AsyncSession = Depends(get_db)):
     try:
         result = await db.execute(select(User).filter(User.email == form_data.username))
@@ -45,7 +45,12 @@ async def login(form_data:OAuth2PasswordRequestForm=Depends(),db:AsyncSession = 
         if not verify_password(form_data.password,existing_user.hashed_password):
             raise HTTPException(status_code=401,detail="Incorrect password")
         access_token=create_access_token(data={"sub":str(existing_user.id),"role":existing_user.role})
-        return {"access_token":access_token,"token_type":"Bearer"}
+        return {
+            "access_token": access_token,
+            "token_type": "Bearer",
+            "name": existing_user.name,
+            "role": existing_user.role,
+        }
     except HTTPException:
         raise
     except Exception as e:

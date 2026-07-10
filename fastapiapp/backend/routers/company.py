@@ -4,6 +4,7 @@ from models.company import Company
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
+from sqlalchemy.exc import IntegrityError
 from database import get_db
 from utils.oauth2 import role_required,get_current_user
 
@@ -16,9 +17,25 @@ async def create_company(company: CompanyCreate,db:AsyncSession=Depends(get_db),
         db.add(db_company)
         await db.commit()
         await db.refresh(db_company)
-        return db_company
+        # re-query with selectinload to ensure relationships are loaded in this async context
+        result = await db.execute(
+            select(Company).options(selectinload(Company.jobs)).filter(Company.id == db_company.id)
+        )
+        company = result.scalars().first()
+        return company
     except Exception as e:
         await db.rollback()
+        if isinstance(e, IntegrityError):
+            orig = str(e.orig).lower()
+            if 'email' in orig:
+                detail = "Email already exists"
+            elif 'phone' in orig:
+                detail = "Phone already exists"
+            elif 'duplicate' in orig or 'unique' in orig:
+                detail = f"Unique constraint violated: {str(e.orig)}"
+            else:
+                detail = f"Integrity error creating company: {str(e.orig)}"
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Database error creating company: {str(e)}")
 
 

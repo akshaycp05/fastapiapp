@@ -44,7 +44,8 @@ def embed_text(text: str) -> list[float]:
 
 async def embed_all_jobs(db: AsyncSession) -> int:
     ensure_collection()
-    jobs = (await db.execute(select(Job)))
+    result = await db.execute(select(Job))
+    jobs = result.scalars().all()
     if not jobs:
         return 0
 

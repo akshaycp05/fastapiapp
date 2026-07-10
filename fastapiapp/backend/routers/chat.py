@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from typing import Optional
 
 from services.langchain_service import ask_ai
 
@@ -10,7 +11,10 @@ router = APIRouter(
 
 
 class ChatRequest(BaseModel):
-    question: str
+    # accept either 'question' (backend) or 'message' (frontend) for compatibility
+    question: Optional[str] = None
+    message: Optional[str] = None
+    session_id: Optional[str] = None
 
 
 class ChatResponse(BaseModel):
@@ -20,11 +24,14 @@ class ChatResponse(BaseModel):
 @router.post("/", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     try:
-        answer = ask_ai(request.question)
+        # prefer 'question', fall back to 'message' from frontend
+        text = request.question or request.message
+        if not text:
+            raise HTTPException(status_code=400, detail="No question/message provided")
 
-        return ChatResponse(
-            response=answer
-        )
+        answer = ask_ai(text)
+
+        return ChatResponse(response=answer)
 
     except Exception as e:
         raise HTTPException(
