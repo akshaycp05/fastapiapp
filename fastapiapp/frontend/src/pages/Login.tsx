@@ -34,12 +34,14 @@ function Login({ defaultEmail = "", onLogin, onSwitchToRegister }: Props) {
           <p className="text-on-surface-variant text-body-md">Welcome back. Login to continue.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-md">
+        <form onSubmit={handleSubmit} className="space-y-md" autoComplete="off">
           <div className="space-y-xs">
             <label className="font-label-md text-[10px] uppercase text-on-surface-variant">Email Address</label>
             <input
               className="w-full p-sm bg-white border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary transition-all rounded"
               type="email"
+              name="email"
+              autoComplete="username"
               placeholder="you@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -52,6 +54,8 @@ function Login({ defaultEmail = "", onLogin, onSwitchToRegister }: Props) {
             <input
               className="w-full p-sm bg-white border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary transition-all rounded"
               type="password"
+              name="password"
+              autoComplete="current-password"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
