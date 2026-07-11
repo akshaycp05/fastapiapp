@@ -6,7 +6,7 @@ type Props = {
 
 function Topbar({ searchPlaceholder = "Search system..." }: Props) {
   const navigate = useNavigate();
-  const { pathname, search } = useLocation();
+  const { search } = useLocation();
   const params = new URLSearchParams(search);
   const active = params.get("tab") || "overview";
 
